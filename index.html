@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<title>用户数据提交</title>
+<style>
+body {
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f5f6fa;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 50px;
+    position: relative;
+}
+h1 {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    color: #2f3640;
+    font-size: 24px;
+}
+form {
+    background: #ffffff;
+    padding: 20px 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    width: 300px;
+}
+input {
+    padding: 10px;
+    border: 1px solid #dcdde1;
+    border-radius: 5px;
+    font-size: 14px;
+}
+button {
+    padding: 10px;
+    background-color: #00a8ff;
+    color: white;
+    font-weight: bold;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+button:hover { background-color: #0097e6; }
+</style>
+</head>
+<body>
+<h1>提交数据</h1>
+<form id="userForm">
+    <input type="text" id="orderNo" placeholder="订单编号" required>
+    <input type="text" id="name" placeholder="姓名" required>
+    <input type="number" id="age" placeholder="年龄" required>
+    <input type="text" id="city" placeholder="城市" required>
+    <button type="submit">提交</button>
+</form>
+
+<script>
+document.getElementById("userForm").addEventListener("submit", async function(e) {
+    e.preventDefault();
+    const orderNo = document.getElementById("orderNo").value;
+    const name = document.getElementById("name").value;
+    const age = document.getElementById("age").value;
+    const city = document.getElementById("city").value;
+
+    const res = await fetch("/add", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ orderNo, name, age, city })
+    });
+    const data = await res.json();
+    alert(data.message);
+    this.reset();
+});
+</script>
+</body>
+</html>

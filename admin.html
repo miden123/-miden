@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<title>后台管理</title>
+<style>
+body {
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f1f2f6;
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+h2 { color: #2f3640; }
+form {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+input {
+    padding: 8px;
+    border-radius: 5px;
+    border: 1px solid #dcdde1;
+    font-size: 14px;
+}
+button {
+    padding: 8px 12px;
+    background-color: #00a8ff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+}
+button:hover { background-color: #0097e6; }
+ul {
+    list-style: none;
+    padding: 0;
+    width: 500px;
+}
+li {
+    background: #ffffff;
+    margin-bottom: 10px;
+    padding: 10px 15px;
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+li button {
+    background-color: #e84118;
+    padding: 5px 10px;
+}
+li button:hover { background-color: #c23616; }
+#totalCount { margin-bottom: 15px; font-weight: bold; color: #2f3640; }
+</style>
+</head>
+<body>
+<h2>后台用户管理</h2>
+
+<form id="addForm">
+    <input type="text" id="orderNo" placeholder="订单编号" required>
+    <input type="text" id="name" placeholder="姓名" required>
+    <input type="number" id="age" placeholder="年龄" required>
+    <input type="text" id="city" placeholder="城市" required>
+    <button type="submit">添加</button>
+</form>
+
+<div id="totalCount">总用户数: 0</div>
+<ul id="userList"></ul>
+
+<script>
+const listEl = document.getElementById("userList");
+const totalCountEl = document.getElementById("totalCount");
+
+// 加载用户列表
+async function loadUsers() {
+    const res = await fetch("/list");
+    const users = await res.json();
+    totalCountEl.textContent = `总用户数: ${users.length}`;
+
+    listEl.innerHTML = "";
+    users.forEach((u, i) => {
+        const li = document.createElement("li");
+        li.innerHTML = `
+            ${u.orderNo} - ${u.name} - ${u.age} - ${u.city}
+            <button onclick="deleteUser(${i})">删除</button>
+        `;
+        listEl.appendChild(li);
+    });
+}
+
+// 删除用户
+async function deleteUser(index) {
+    await fetch(`/delete/${index}`, { method: "DELETE" });
+    loadUsers();
+}
+
+// 添加用户
+document.getElementById("addForm").addEventListener("submit", async function(e) {
+    e.preventDefault();
+    const orderNo = document.getElementById("orderNo").value;
+    const name = document.getElementById("name").value;
+    const age = document.getElementById("age").value;
+    const city = document.getElementById("city").value;
+
+    const res = await fetch("/add", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ orderNo, name, age, city })
+    });
+    const data = await res.json();
+    alert(data.message);
+    this.reset();
+    loadUsers();
+});
+
+// 初次加载
+loadUsers();
+</script>
+</body>
+</html>
